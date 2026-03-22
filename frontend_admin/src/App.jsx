@@ -4,9 +4,10 @@ import LoginPage from './components/LoginPage'
 import PublicSection from './sections/PublicSection'
 import AccountSection from './sections/AccountSection'
 import AdminSection from './sections/AdminSection'
+import PostSection from './sections/PostSection'
 import { getToken, setToken, clearToken } from './api'
 
-const SECTIONS = ['public', 'account', 'admin']
+const SECTIONS = ['public', 'account', 'admin', 'posts']
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('public')
@@ -33,6 +34,7 @@ export default function App() {
     public: useRef(null),
     account: useRef(null),
     admin: useRef(null),
+    posts: useRef(null),
   }
 
   const handleTokenChange = (newToken) => {
@@ -105,6 +107,10 @@ export default function App() {
 
           <div ref={sectionRefs.admin}>
             <AdminSection token={token} onTokenReceived={handleTokenChange} />
+          </div>
+
+          <div ref={sectionRefs.posts}>
+            <PostSection token={token} onTokenReceived={handleTokenChange} />
           </div>
 
           {/* Footer */}

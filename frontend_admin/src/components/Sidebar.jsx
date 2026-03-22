@@ -30,6 +30,17 @@ const NAV_SECTIONS = [
       { id: 'user-delete', label: 'Delete User', method: 'DELETE' },
     ],
   },
+  {
+    label: 'Posts',
+    id: 'posts',
+    items: [
+      { id: 'posts-list', label: 'List Posts', method: 'GET' },
+      { id: 'posts-create', label: 'Create Post', method: 'POST' },
+      { id: 'post-get', label: 'Get Post', method: 'GET' },
+      { id: 'post-update', label: 'Update Post', method: 'PUT' },
+      { id: 'post-delete', label: 'Delete Post', method: 'DELETE' },
+    ],
+  },
 ]
 
 const METHOD_COLORS = {
