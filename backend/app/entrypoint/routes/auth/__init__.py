@@ -5,3 +5,4 @@ auth_blueprint = Blueprint('auth', __name__)
 
 # Import routes so they are registered with the blueprint
 from . import routes
+from . import oauth_routes

@@ -65,7 +65,7 @@ class UserRead(BaseModel):
     uuid: str
     username: str
     email: Optional[str]
-    is_email_verified: bool
+    is_verified: bool
     karma: int
     avatar_seed: str
     phone_number: Optional[str]
