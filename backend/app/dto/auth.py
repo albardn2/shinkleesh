@@ -1,68 +1,57 @@
 from enum import Enum
+from typing import Optional, List
 
 import pydantic
 from pydantic import BaseModel, ConfigDict, Field, EmailStr
-from typing import Optional, List
 from datetime import datetime
+
 from app.entrypoint.routes.common.errors import BadRequestError
 
 
 class PermissionScope(str, Enum):
     SUPER_ADMIN = "superuser"
     ADMIN = "admin"
-    OPERATION_MANAGER = "operation_manager"
-    ACCOUNTANT = "accountant"
-    OPERATOR = "operator"
-    DRIVER = "driver"
-    SALES = "sales"
+    MODERATOR = "moderator"
+
 
 class RegisterRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     username: str
-    first_name: str
-    last_name: str
     password: str
-    permission_scope: Optional[str] = PermissionScope.OPERATOR.value
     email: Optional[EmailStr] = None
     phone_number: Optional[str] = None
     language: Optional[str] = None
-    rfid_token: Optional[str] = None  # RFID token for user identification
 
-    @pydantic.model_validator(mode="after")
-    def username_not_email(cls, values):
-        username = values.username
-        # crude check – you can tighten this regex if you like
-        if "@" in username:
-            raise ValueError("username must not be an email address")
-        return values
-
+    @pydantic.field_validator("username")
+    @classmethod
+    def username_valid(cls, v: str) -> str:
+        import re
+        if not re.fullmatch(r"[a-zA-Z0-9_]+", v):
+            raise ValueError("username may only contain letters, numbers, and underscores")
+        return v
+    
 
 class UserUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     username: Optional[str] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     phone_number: Optional[str] = None
     language: Optional[str] = None
     password: Optional[str] = None
-    rfid_token: Optional[str] = None  # RFID token for user identification
-    # only admins may change this:
+    notification_token: Optional[str] = None
+
+
+class AdminUserUpdate(UserUpdate):
+    """Extended update payload available to admins only."""
     permission_scope: Optional[str] = None
+    is_banned: Optional[bool] = None
+    ban_reason: Optional[str] = None
+
 
 class LoginRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    username_or_email: Optional[str] = None
-    password: Optional[str] = None
-    rfid_token: Optional[str] = None
-
-    @pydantic.model_validator(mode="after")
-    def check_credentials(cls, values):
-        if not values.username_or_email and not values.rfid_token:
-            raise BadRequestError("Either username_or_email or rfid_token must be provided")
-        if values.username_or_email and values.rfid_token:
-            raise BadRequestError("Only one of username_or_email or rfid_token should be provided")
-        return values
+    username_or_email: str
+    password: str
 
 
 class TokenResponse(BaseModel):
@@ -70,31 +59,33 @@ class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
 
+
 class UserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True, extra="forbid")
     uuid: str
     username: str
-    first_name: str
-    last_name: str
     email: Optional[str]
+    is_email_verified: bool
+    karma: int
+    avatar_seed: str
     phone_number: Optional[str]
     language: Optional[str]
-    created_at: datetime
+    is_banned: bool
     permission_scope: Optional[str]
+    created_at: datetime
     is_deleted: bool
 
 
 class UserListParams(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    uuid: Optional[str] = None
     username: Optional[str] = None
     email: Optional[str] = None
+    is_banned: Optional[bool] = None
     permission_scope: Optional[PermissionScope] = None
-    phone_number: Optional[str] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    uuid: Optional[str] = None
     page: int = Field(1, gt=0)
     per_page: int = Field(20, gt=0, le=100)
+
 
 class UserPage(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -103,5 +94,3 @@ class UserPage(BaseModel):
     page: int
     per_page: int
     pages: int
-
-
