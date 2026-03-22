@@ -10,7 +10,25 @@ const SECTIONS = ['public', 'account', 'admin']
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('public')
-  const [token, setTokenState] = useState(() => getToken())
+  const [token, setTokenState] = useState(() => {
+    // Handle OAuth callback: pick up ?token= from the URL
+    const params = new URLSearchParams(window.location.search)
+    const oauthToken = params.get('token')
+    const oauthError = params.get('error')
+
+    if (oauthToken) {
+      setToken(oauthToken)
+      window.history.replaceState({}, '', window.location.pathname)
+      return oauthToken
+    }
+
+    if (oauthError) {
+      // Clear the param so it doesn't linger; the LoginPage will show nothing extra
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+
+    return getToken()
+  })
   const sectionRefs = {
     public: useRef(null),
     account: useRef(null),

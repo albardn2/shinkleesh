@@ -24,7 +24,7 @@ class User(Base):
     uuid = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     username = Column(String(50), nullable=False, unique=True)
     email = Column(String(120), nullable=True, unique=True)
-    is_email_verified = Column(Boolean, default=False, nullable=False)
+    is_verified = Column(Boolean, default=False, nullable=False)
     password = Column(String(128), nullable=False)
 
     # Core YikYak mechanic — reputation score
@@ -56,6 +56,10 @@ class User(Base):
     last_active_at = Column(DateTime(timezone=True), nullable=True)
 
     is_deleted = Column(Boolean, default=False, nullable=False)
+
+    # OAuth / social login
+    oauth_provider = Column(String(50), nullable=True)       # e.g. "google", "facebook", "x"
+    oauth_provider_id = Column(String(256), nullable=True)   # provider's user ID
 
     def set_password(self, plaintext_password):
         hashed_pw = bcrypt.hashpw(
