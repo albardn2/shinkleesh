@@ -18,7 +18,7 @@ RUN apt-get update \
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
 # 5. Set working dir
-WORKDIR /karma
+WORKDIR /shinkleesh
 
 # 6. Copy Poetry files and install deps
 COPY pyproject.toml poetry.lock poetry.toml* ./

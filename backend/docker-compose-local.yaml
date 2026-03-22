@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:13-3.1-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: shinkleesh
+      POSTGRES_PASSWORD: shinkleesh
+      POSTGRES_DB: shinkleesh
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "shinkleesh", "-d", "shinkleesh"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    command: postgres -c listen_addresses='*'
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+
+  migrate:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["alembic", "upgrade", "head"]
+    environment:
+      SQLALCHEMY_DATABASE_URI: "postgresql://shinkleesh:shinkleesh@db:5432/shinkleesh"
+    restart: on-failure
+
+  web:
+    build: .
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    entrypoint: ["python", "run.py"]
+    environment:
+      SQLALCHEMY_DATABASE_URI: "postgresql://shinkleesh:shinkleesh@db:5432/shinkleesh"
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/shinkleesh  # live-reload: local code is mounted into the container
+
+volumes:
+  postgres_data_local:
