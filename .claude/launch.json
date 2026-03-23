@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "frontend_admin", "run", "dev"],
       "port": 5173
+    },
+    {
+      "name": "expo-app",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--prefix", "expo_app", "expo", "start", "--port", "8081"],
+      "port": 8081
     }
   ]
 }
