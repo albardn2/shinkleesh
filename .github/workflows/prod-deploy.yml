@@ -75,6 +75,7 @@ jobs:
           password: ${{ secrets.PROD_DROPLET_PASSWORD }}
           port: 22
           script: |
+            echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             cd /root/app/backend
             cat <<EOF > .env
             APP_HOST=api-prod.shinkleesh.com
@@ -98,6 +99,7 @@ jobs:
           password: ${{ env.PROD_PASS }}
           port: 22
           script: |
+            echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             cd /root/app/backend
             cat <<EOF > .env
             APP_HOST=api-prod.shinkleesh.com
