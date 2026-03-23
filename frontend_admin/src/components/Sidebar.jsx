@@ -35,6 +35,8 @@ const NAV_SECTIONS = [
     label: 'Posts',
     id: 'posts',
     items: [
+      { id: 'feed-new', label: 'New Feed', method: 'GET' },
+      { id: 'feed-hot', label: 'Hot Feed', method: 'GET' },
       { id: 'posts-list', label: 'List Posts', method: 'GET' },
       { id: 'posts-create', label: 'Create Post', method: 'POST' },
       { id: 'post-get', label: 'Get Post', method: 'GET' },

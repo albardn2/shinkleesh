@@ -18,6 +18,40 @@ export default function PostSection({ token, onTokenReceived }) {
 
       <div className="space-y-4">
         <RouteCard
+          id="feed-new"
+          method="GET"
+          path="/posts/feed/new"
+          title="New Feed"
+          description="Location-based newsfeed sorted by newest. Expands to neighbouring H3 tiles when the user's tile has fewer than 20 posts."
+          queryFields={[
+            { name: 'lat', label: 'Latitude', placeholder: 'e.g. 37.7749' },
+            { name: 'lng', label: 'Longitude', placeholder: 'e.g. -122.4194' },
+            { name: 'page', label: 'Page', placeholder: '1', optional: true },
+            { name: 'per_page', label: 'Per Page', placeholder: '20', optional: true },
+          ]}
+          requiresAuth
+          token={token}
+          onTokenReceived={onTokenReceived}
+        />
+
+        <RouteCard
+          id="feed-hot"
+          method="GET"
+          path="/posts/feed/hot"
+          title="Hot Feed"
+          description="Location-based newsfeed sorted by hottest (total votes + comments). Expands to neighbouring H3 tiles when needed."
+          queryFields={[
+            { name: 'lat', label: 'Latitude', placeholder: 'e.g. 37.7749' },
+            { name: 'lng', label: 'Longitude', placeholder: 'e.g. -122.4194' },
+            { name: 'page', label: 'Page', placeholder: '1', optional: true },
+            { name: 'per_page', label: 'Per Page', placeholder: '20', optional: true },
+          ]}
+          requiresAuth
+          token={token}
+          onTokenReceived={onTokenReceived}
+        />
+
+        <RouteCard
           id="posts-list"
           method="GET"
           path="/posts"

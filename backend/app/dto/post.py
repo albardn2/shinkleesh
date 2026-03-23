@@ -40,6 +40,14 @@ class PostListParams(BaseModel):
     per_page: int = Field(20, gt=0, le=100)
 
 
+class FeedParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    lat: float
+    lng: float
+    page: int = Field(1, gt=0)
+    per_page: int = Field(20, gt=0, le=100)
+
+
 class PostPage(BaseModel):
     model_config = ConfigDict(extra="forbid")
     posts: List[PostRead]
