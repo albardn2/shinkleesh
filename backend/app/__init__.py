@@ -11,6 +11,7 @@ from app.entrypoint.routes.common.errors import register_error_handlers
 from app.entrypoint.routes.auth import auth_blueprint
 from app.entrypoint.routes.post import post_blueprint
 from app.entrypoint.routes.comment import comment_blueprint
+from app.entrypoint.routes.vote import vote_blueprint
 
 
 jwt = JWTManager()
@@ -78,6 +79,7 @@ def create_app(config_object=Config):
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
     app.register_blueprint(post_blueprint, url_prefix='/posts')
     app.register_blueprint(comment_blueprint, url_prefix='/comments')
+    app.register_blueprint(vote_blueprint, url_prefix='/votes')
 
     register_error_handlers(app)
     return app

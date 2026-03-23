@@ -20,6 +20,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/votes': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState, useEffect, useRef } from 'react'
 import Sidebar from './components/Sidebar'
 import LoginPage from './components/LoginPage'
@@ -6,9 +7,10 @@ import AccountSection from './sections/AccountSection'
 import AdminSection from './sections/AdminSection'
 import PostSection from './sections/PostSection'
 import CommentSection from './sections/CommentSection'
+import VoteSection from './sections/VoteSection'
 import { getToken, setToken, clearToken } from './api'
 
-const SECTIONS = ['public', 'account', 'admin', 'posts', 'comments']
+const SECTIONS = ['public', 'account', 'admin', 'posts', 'comments', 'votes']
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('public')
@@ -37,6 +39,7 @@ export default function App() {
     admin: useRef(null),
     posts: useRef(null),
     comments: useRef(null),
+    votes: useRef(null),
   }
 
   const handleTokenChange = (newToken) => {
@@ -117,6 +120,10 @@ export default function App() {
 
           <div ref={sectionRefs.comments}>
             <CommentSection token={token} onTokenReceived={handleTokenChange} />
+          </div>
+
+          <div ref={sectionRefs.votes}>
+            <VoteSection token={token} onTokenReceived={handleTokenChange} />
           </div>
 
           {/* Footer */}

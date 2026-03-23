@@ -26,6 +26,7 @@ class CommentRead(BaseModel):
     lat: float
     lng: float
     h3_l7: str
+    vote_count: int
     is_hidden: bool
     is_deleted: bool
     created_at: datetime
