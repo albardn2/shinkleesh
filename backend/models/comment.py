@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Integer,
     String,
     Text,
 )
@@ -40,6 +41,9 @@ class Comment(Base):
 
     # H3 spatial index (level 7 ≈ 5 km² hexagon)
     h3_l7 = Column(String(15), nullable=False, index=True)
+
+    # YikYak-style voting (upvotes − downvotes, cached aggregate)
+    vote_count = Column(Integer, default=0, nullable=False)
 
     # Moderation
     is_hidden = Column(Boolean, default=False, nullable=False)

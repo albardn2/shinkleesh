@@ -1,3 +1,4 @@
+import React from 'react'
 import RouteCard from '../components/RouteCard'
 
 const PERMISSION_SCOPE_OPTIONS = [

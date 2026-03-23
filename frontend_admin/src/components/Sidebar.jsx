@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState } from 'react'
 import { clearToken, decodeJwtPayload } from '../api'
 
@@ -50,6 +51,14 @@ const NAV_SECTIONS = [
       { id: 'comment-get', label: 'Get Comment', method: 'GET' },
       { id: 'comment-update', label: 'Update Comment', method: 'PUT' },
       { id: 'comment-delete', label: 'Delete Comment', method: 'DELETE' },
+    ],
+  },
+  {
+    label: 'Votes',
+    id: 'votes',
+    items: [
+      { id: 'vote-cast', label: 'Cast / Change Vote', method: 'POST' },
+      { id: 'vote-remove', label: 'Remove Vote', method: 'DELETE' },
     ],
   },
 ]
