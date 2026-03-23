@@ -1,0 +1,45 @@
+{
+  "cli": {
+    "version": ">= 15.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "autoIncrement": true,
+      "channel": "preview",
+      "ios": {
+        "simulator": false
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "autoIncrement": true,
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "preview": {
+      "ios": {
+        "appleId": "zaid.bardan@gmail.com",
+        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "YOUR_APPLE_TEAM_ID"
+      },
+      "android": {
+        "track": "internal",
+        "serviceAccountKeyPath": "./google-service-account-key.json"
+      }
+    },
+    "production": {
+      "ios": {
+        "appleId": "zaid.bardan@gmail.com",
+        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "YOUR_APPLE_TEAM_ID"
+      },
+      "android": {
+        "track": "production",
+        "serviceAccountKeyPath": "./google-service-account-key.json"
+      }
+    }
+  }
+}
