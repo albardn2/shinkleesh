@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from app.adapters.unit_of_work._abstract_unit_of_work import AbstractUnitOfWork
 from app.adapters.repositories.user_repository import UserRepository
 from app.adapters.repositories.post_repository import PostRepository
+from app.adapters.repositories.comment_repository import CommentRepository
 
 
 SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")  # type: ignore
@@ -18,6 +19,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session = self.session_factory()
         self.user_repository = UserRepository(session=self.session)
         self.post_repository = PostRepository(session=self.session)
+        self.comment_repository = CommentRepository(session=self.session)
 
         return self
 
