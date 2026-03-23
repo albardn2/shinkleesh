@@ -1,0 +1,109 @@
+name: CD – Prod Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY_URL: ghcr.io/albardn2/shinkleesh-backend
+  PROD_HOST: ${{ secrets.PROD_DROPLET_HOST }}
+  PROD_USER: root
+  PROD_PASS: ${{ secrets.PROD_DROPLET_PASSWORD }}
+  APP_HOST: api-prod.shinkleesh.com
+  EMAIL: zaid.bardan@gmail.com
+
+jobs:
+  build:
+    name: Build & Push Prod Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Build & push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY_URL }}:latest-prod
+            ${{ env.REGISTRY_URL }}:${{ env.SHORT_SHA }}-prod
+
+  migrate:
+    name: Run prod migrations
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy compose to prod server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.PROD_DROPLET_HOST }}
+          username: root
+          password: ${{ secrets.PROD_DROPLET_PASSWORD }}
+          port: 22
+          source: |
+            ./backend/docker-compose.prod.yaml
+          target: /root/app
+
+      - name: SSH & migrate
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_DROPLET_HOST }}
+          username: root
+          password: ${{ secrets.PROD_DROPLET_PASSWORD }}
+          port: 22
+          script: |
+            cd /root/app/backend
+            cat <<EOF > .env
+            APP_HOST=api-prod.shinkleesh.com
+            REGISTRY_URL=ghcr.io/albardn2/shinkleesh-backend
+            EMAIL=zaid.bardan@gmail.com
+            EOF
+            docker compose -f docker-compose.prod.yaml down
+            docker compose -f docker-compose.prod.yaml pull
+            docker compose -f docker-compose.prod.yaml run --rm migrate
+
+  deploy:
+    name: Deploy prod stack
+    runs-on: ubuntu-latest
+    needs: migrate
+    steps:
+      - name: SSH & deploy
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ env.PROD_HOST }}
+          username: ${{ env.PROD_USER }}
+          password: ${{ env.PROD_PASS }}
+          port: 22
+          script: |
+            cd /root/app/backend
+            cat <<EOF > .env
+            APP_HOST=api-prod.shinkleesh.com
+            REGISTRY_URL=ghcr.io/albardn2/shinkleesh-backend
+            EMAIL=zaid.bardan@gmail.com
+            EOF
+            docker compose -f docker-compose.prod.yaml down
+            docker compose -f docker-compose.prod.yaml pull
+            docker compose -f docker-compose.prod.yaml up -d --scale migrate=0 --remove-orphans

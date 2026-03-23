@@ -1,0 +1,44 @@
+name: CD – Migrate Dev Stack
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy compose to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.DEV_DROPLET_HOST }}
+          username: root
+          password: ${{ secrets.DEV_DROPLET_PASSWORD }}
+          port: 22
+          source: |
+            ./backend/docker-compose.dev.yaml
+          target: /root/app
+
+      - name: Migrate via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DEV_DROPLET_HOST }}
+          username: root
+          password: ${{ secrets.DEV_DROPLET_PASSWORD }}
+          port: 22
+          script: |
+            cd /root/app/backend
+            cat <<EOF > .env
+            APP_HOST=api-dev.shinkleesh.com
+            REGISTRY_URL=ghcr.io/albardn2/shinkleesh-backend
+            EMAIL=zaid.bardan@gmail.com
+            EOF
+            docker compose -f docker-compose.dev.yaml down
+            docker compose -f docker-compose.dev.yaml pull
+            docker compose -f docker-compose.dev.yaml run --rm migrate

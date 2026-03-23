@@ -21,7 +21,7 @@ services:
       - proxy
 
   migrate:
-    image: ghcr.io/albardn2/karma-backend:latest-prod
+    image: ghcr.io/albardn2/shinkleesh-backend:latest-prod
     depends_on:
       db:
         condition: service_healthy
@@ -35,7 +35,7 @@ services:
       - proxy
 
   web:
-    image: ghcr.io/albardn2/karma-backend:latest-prod
+    image: ghcr.io/albardn2/shinkleesh-backend:latest-prod
     restart: always
     depends_on:
       - db
