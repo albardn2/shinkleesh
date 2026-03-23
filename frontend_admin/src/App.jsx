@@ -1,21 +1,16 @@
 import React from 'react'
-import { useState, useEffect, useRef } from 'react'
-import Sidebar from './components/Sidebar'
+import { useState, useMemo } from 'react'
 import LoginPage from './components/LoginPage'
-import PublicSection from './sections/PublicSection'
-import AccountSection from './sections/AccountSection'
-import AdminSection from './sections/AdminSection'
-import PostSection from './sections/PostSection'
-import CommentSection from './sections/CommentSection'
-import VoteSection from './sections/VoteSection'
-import { getToken, setToken, clearToken } from './api'
-
-const SECTIONS = ['public', 'account', 'admin', 'posts', 'comments', 'votes']
+import TopNav from './components/TopNav'
+import HomePage from './pages/HomePage'
+import ProfilePage from './pages/ProfilePage'
+import ApiExplorerPage from './pages/ApiExplorerPage'
+import AdminPage from './pages/AdminPage'
+import { getToken, setToken, clearToken, decodeJwtPayload } from './api'
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState('public')
+  const [activeTab, setActiveTab] = useState('home')
   const [token, setTokenState] = useState(() => {
-    // Handle OAuth callback: pick up ?token= from the URL
     const params = new URLSearchParams(window.location.search)
     const oauthToken = params.get('token')
     const oauthError = params.get('error')
@@ -27,19 +22,23 @@ export default function App() {
     }
 
     if (oauthError) {
-      // Clear the param so it doesn't linger; the LoginPage will show nothing extra
       window.history.replaceState({}, '', window.location.pathname)
     }
 
     return getToken()
   })
-  const sectionRefs = {
-    public: useRef(null),
-    account: useRef(null),
-    admin: useRef(null),
-    posts: useRef(null),
-    comments: useRef(null),
-    votes: useRef(null),
+
+  const [location, setLocation] = useState(() => {
+    const saved = localStorage.getItem('shinkleesh_location')
+    if (saved) {
+      try { return JSON.parse(saved) } catch { /* fall through */ }
+    }
+    return { lat: '37.7749', lng: '-122.4194' }
+  })
+
+  const handleLocationChange = (newLoc) => {
+    setLocation(newLoc)
+    localStorage.setItem('shinkleesh_location', JSON.stringify(newLoc))
   }
 
   const handleTokenChange = (newToken) => {
@@ -51,90 +50,46 @@ export default function App() {
     setTokenState(newToken)
   }
 
-  const handleNavigate = (sectionId) => {
-    setActiveSection(sectionId)
-    setTimeout(() => {
-      const el = sectionRefs[sectionId]?.current
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 30)
+  const handleLogout = () => {
+    clearToken()
+    setTokenState(null)
   }
 
-  // Intersection observer to track which section is in view
-  useEffect(() => {
-    const observers = SECTIONS.map(id => {
-      const el = sectionRefs[id]?.current
-      if (!el) return null
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveSection(id)
-        },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    }).filter(Boolean)
-
-    return () => observers.forEach(o => o.disconnect())
-  }, [])
+  const isAdmin = useMemo(() => {
+    if (!token) return false
+    const payload = decodeJwtPayload(token)
+    const scope = payload?.scope || ''
+    return scope === 'superuser' || scope === 'admin'
+  }, [token])
 
   if (!token) {
     return <LoginPage onLogin={handleTokenChange} />
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      <Sidebar
-        activeSection={activeSection}
-        onNavigate={handleNavigate}
+    <div className="min-h-screen bg-slate-100">
+      <TopNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isAdmin={isAdmin}
         token={token}
-        onTokenChange={handleTokenChange}
+        onLogout={handleLogout}
       />
 
-      {/* Main content — offset by sidebar width */}
-      <main className="flex-1 ml-64 min-h-screen">
-        <div className="max-w-3xl mx-auto px-8 py-10 space-y-16">
-          {/* Page header */}
-          <div className="pb-2 border-b border-slate-200">
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">API Explorer</h1>
-            <p className="text-slate-500 mt-1 text-sm">
-              Test Shinkleesh backend endpoints directly from the browser. Token is stored in localStorage.
-            </p>
-          </div>
-
-          {/* Sections */}
-          <div ref={sectionRefs.public}>
-            <PublicSection token={token} onTokenReceived={handleTokenChange} />
-          </div>
-
-          <div ref={sectionRefs.account}>
-            <AccountSection token={token} onTokenReceived={handleTokenChange} />
-          </div>
-
-          <div ref={sectionRefs.admin}>
-            <AdminSection token={token} onTokenReceived={handleTokenChange} />
-          </div>
-
-          <div ref={sectionRefs.posts}>
-            <PostSection token={token} onTokenReceived={handleTokenChange} />
-          </div>
-
-          <div ref={sectionRefs.comments}>
-            <CommentSection token={token} onTokenReceived={handleTokenChange} />
-          </div>
-
-          <div ref={sectionRefs.votes}>
-            <VoteSection token={token} onTokenReceived={handleTokenChange} />
-          </div>
-
-          {/* Footer */}
-          <div className="pt-4 pb-10 border-t border-slate-200 text-center">
-            <p className="text-xs text-slate-400">
-              Shinkleesh Admin Panel &mdash; requests proxied to{' '}
-              <code className="text-slate-500 bg-slate-100 px-1 py-0.5 rounded">http://localhost:5000</code>
-            </p>
-          </div>
-        </div>
-      </main>
+      <div className="pt-16">
+        {activeTab === 'home' && (
+          <HomePage token={token} location={location} />
+        )}
+        {activeTab === 'profile' && (
+          <ProfilePage token={token} location={location} onLocationChange={handleLocationChange} />
+        )}
+        {activeTab === 'explorer' && (
+          <ApiExplorerPage token={token} onTokenChange={handleTokenChange} />
+        )}
+        {activeTab === 'admin' && (
+          <AdminPage token={token} onTokenChange={handleTokenChange} />
+        )}
+      </div>
     </div>
   )
 }
