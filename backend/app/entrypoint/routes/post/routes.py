@@ -1,3 +1,6 @@
+import math
+
+import h3
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -6,6 +9,7 @@ from app.domains.post.domain import PostDomain
 from app.dto.post import (
     CreatePostRequest,
     UpdatePostRequest,
+    FeedParams,
     PostListParams,
     PostPage,
     PostRead,
@@ -13,6 +17,8 @@ from app.dto.post import (
 from app.entrypoint.routes.post import post_blueprint
 from app.entrypoint.routes.common.errors import NotFoundError
 from models.post import Post as PostModel
+
+FEED_MIN_POSTS = 20
 
 
 # ---------------------------------------------------------------------------
@@ -74,6 +80,77 @@ def delete_post(post_uuid: str):
 # ---------------------------------------------------------------------------
 # List / Feed
 # ---------------------------------------------------------------------------
+
+def _build_post_page(posts, page, per_page):
+    total = len(posts)
+    offset = (page - 1) * per_page
+    page_posts = posts[offset:offset + per_page]
+    return PostPage(
+        posts=[PostRead.from_orm(p) for p in page_posts],
+        total_count=total,
+        page=page,
+        per_page=per_page,
+        pages=math.ceil(total / per_page) if per_page else 0,
+    )
+
+
+@post_blueprint.route("/feed/new", methods=["GET"])
+@jwt_required()
+def new_feed():
+    """Newsfeed sorted by newest. Expands to k-ring neighbours when the user's
+    h3 tile has fewer than FEED_MIN_POSTS posts."""
+    params = FeedParams(**request.args)
+    h3_cell = h3.latlng_to_cell(params.lat, params.lng, 7)
+    base_filters = [PostModel.is_deleted == False, PostModel.is_hidden == False]
+
+    with SqlAlchemyUnitOfWork() as uow:
+        main_posts = uow.post_repository._find_all_by_filters(
+            filters=base_filters + [PostModel.h3_l7 == h3_cell],
+            ordering=[PostModel.created_at.desc()],
+        )
+
+        kring_posts = []
+        if len(main_posts) < FEED_MIN_POSTS:
+            kring_cells = list(h3.grid_ring(h3_cell, 1))
+            kring_posts = uow.post_repository._find_all_by_filters(
+                filters=base_filters + [PostModel.h3_l7.in_(kring_cells)],
+                ordering=[PostModel.created_at.desc()],
+            )
+
+        # Main tile posts first (newest), then kring posts (newest)
+        all_posts = main_posts + kring_posts
+        result = _build_post_page(all_posts, params.page, params.per_page).model_dump(mode="json")
+
+    return jsonify(result), 200
+
+
+@post_blueprint.route("/feed/hot", methods=["GET"])
+@jwt_required()
+def hot_feed():
+    """Newsfeed sorted by hottest (votes + comments). Expands to k-ring
+    neighbours when the user's h3 tile has fewer than FEED_MIN_POSTS posts."""
+    params = FeedParams(**request.args)
+    h3_cell = h3.latlng_to_cell(params.lat, params.lng, 7)
+    base_filters = [PostModel.is_deleted == False, PostModel.is_hidden == False]
+
+    with SqlAlchemyUnitOfWork() as uow:
+        main_posts = uow.post_repository._find_all_by_filters(
+            filters=base_filters + [PostModel.h3_l7 == h3_cell],
+        )
+
+        all_posts = list(main_posts)
+        if len(main_posts) < FEED_MIN_POSTS:
+            kring_cells = list(h3.grid_ring(h3_cell, 1))
+            kring_posts = uow.post_repository._find_all_by_filters(
+                filters=base_filters + [PostModel.h3_l7.in_(kring_cells)],
+            )
+            all_posts += kring_posts
+
+        all_posts.sort(key=lambda p: p.vote_count + p.comment_count, reverse=True)
+        result = _build_post_page(all_posts, params.page, params.per_page).model_dump(mode="json")
+
+    return jsonify(result), 200
+
 
 @post_blueprint.route("", methods=["GET"])
 @jwt_required()
