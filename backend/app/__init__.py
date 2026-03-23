@@ -10,6 +10,7 @@ from authlib.integrations.flask_client import OAuth
 from app.entrypoint.routes.common.errors import register_error_handlers
 from app.entrypoint.routes.auth import auth_blueprint
 from app.entrypoint.routes.post import post_blueprint
+from app.entrypoint.routes.comment import comment_blueprint
 
 
 jwt = JWTManager()
@@ -76,6 +77,7 @@ def create_app(config_object=Config):
     # Register blueprints
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
     app.register_blueprint(post_blueprint, url_prefix='/posts')
+    app.register_blueprint(comment_blueprint, url_prefix='/comments')
 
     register_error_handlers(app)
     return app

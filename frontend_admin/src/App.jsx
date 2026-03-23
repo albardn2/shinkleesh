@@ -5,9 +5,10 @@ import PublicSection from './sections/PublicSection'
 import AccountSection from './sections/AccountSection'
 import AdminSection from './sections/AdminSection'
 import PostSection from './sections/PostSection'
+import CommentSection from './sections/CommentSection'
 import { getToken, setToken, clearToken } from './api'
 
-const SECTIONS = ['public', 'account', 'admin', 'posts']
+const SECTIONS = ['public', 'account', 'admin', 'posts', 'comments']
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('public')
@@ -35,6 +36,7 @@ export default function App() {
     account: useRef(null),
     admin: useRef(null),
     posts: useRef(null),
+    comments: useRef(null),
   }
 
   const handleTokenChange = (newToken) => {
@@ -111,6 +113,10 @@ export default function App() {
 
           <div ref={sectionRefs.posts}>
             <PostSection token={token} onTokenReceived={handleTokenChange} />
+          </div>
+
+          <div ref={sectionRefs.comments}>
+            <CommentSection token={token} onTokenReceived={handleTokenChange} />
           </div>
 
           {/* Footer */}
