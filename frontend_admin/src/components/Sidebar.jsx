@@ -41,6 +41,17 @@ const NAV_SECTIONS = [
       { id: 'post-delete', label: 'Delete Post', method: 'DELETE' },
     ],
   },
+  {
+    label: 'Comments',
+    id: 'comments',
+    items: [
+      { id: 'comments-list', label: 'List Comments', method: 'GET' },
+      { id: 'comments-create', label: 'Create Comment', method: 'POST' },
+      { id: 'comment-get', label: 'Get Comment', method: 'GET' },
+      { id: 'comment-update', label: 'Update Comment', method: 'PUT' },
+      { id: 'comment-delete', label: 'Delete Comment', method: 'DELETE' },
+    ],
+  },
 ]
 
 const METHOD_COLORS = {
