@@ -21,9 +21,9 @@
   "submit": {
     "preview": {
       "ios": {
-        "appleId": "zaid.bardan@gmail.com",
-        "ascAppId": "6761047622",
-        "appleTeamId": "UD7TC34D46"
+        "ascApiKeyId": "${APPLE_API_KEY_ID}",
+        "ascApiKeyIssuerId": "${APPLE_API_ISSUER_ID}",
+        "ascApiKeyPath": "./asc-api-key.p8"
       },
       "android": {
         "track": "internal",
@@ -32,9 +32,9 @@
     },
     "production": {
       "ios": {
-        "appleId": "zaid.bardan@gmail.com",
-        "ascAppId": "6761047622",
-        "appleTeamId": "UD7TC34D46"
+        "ascApiKeyId": "${APPLE_API_KEY_ID}",
+        "ascApiKeyIssuerId": "${APPLE_API_ISSUER_ID}",
+        "ascApiKeyPath": "./asc-api-key.p8"
       },
       "android": {
         "track": "production",
