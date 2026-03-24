@@ -21,6 +21,7 @@
   "submit": {
     "preview": {
       "ios": {
+        "ascAppId": "6761047622",
         "ascApiKeyId": "${APPLE_API_KEY_ID}",
         "ascApiKeyIssuerId": "${APPLE_API_ISSUER_ID}",
         "ascApiKeyPath": "./asc-api-key.p8"
@@ -32,6 +33,7 @@
     },
     "production": {
       "ios": {
+        "ascAppId": "6761047622",
         "ascApiKeyId": "${APPLE_API_KEY_ID}",
         "ascApiKeyIssuerId": "${APPLE_API_ISSUER_ID}",
         "ascApiKeyPath": "./asc-api-key.p8"
