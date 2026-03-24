@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.albardn2.shinkleesh"
+      "bundleIdentifier": "com.albardn2.shinkleesh",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -45,6 +48,18 @@
         }
       ],
       "./plugins/withDisableExplicitModules"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2fa16db6-1f05-4cfc-be6e-b615ac3b8166"
+      }
+    },
+    "owner": "albardn2",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2fa16db6-1f05-4cfc-be6e-b615ac3b8166"
+    }
   }
 }
