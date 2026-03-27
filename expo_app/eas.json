@@ -28,6 +28,7 @@
       },
       "android": {
         "track": "internal",
+        "releaseStatus": "draft",
         "serviceAccountKeyPath": "./google-service-account-key.json"
       }
     },
