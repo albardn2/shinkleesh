@@ -97,9 +97,23 @@ jobs:
           echo "$APPLE_API_KEY_P8_BASE64" | base64 --decode > asc-api-key.p8
           eas submit --platform ios --profile production --non-interactive --latest
 
-      - name: Cleanup secrets
+      - name: Cleanup iOS secrets
         if: always()
         run: rm -f asc-api-key.p8
+
+      - name: Build Android
+        run: eas build --platform android --profile production --non-interactive
+
+      - name: Submit Android to Google Play (production track)
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_BASE64 }}
+        run: |
+          echo "$GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_BASE64" | base64 --decode > google-service-account-key.json
+          eas submit --platform android --profile production --non-interactive --latest
+
+      - name: Cleanup Android secrets
+        if: always()
+        run: rm -f google-service-account-key.json
 
       - name: Create git tag
         run: |
