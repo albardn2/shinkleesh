@@ -3,6 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import type { PostRead } from "../types/api";
 import VoteButtons from "./VoteButtons";
 
+const BORDER = "#F0F0F0";
+const TEXT_PRIMARY = "#1A1A1A";
+const TEXT_SECONDARY = "#A3A3A3";
+
 function timeAgo(dateStr: string): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
@@ -48,15 +52,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#fff",
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: BORDER,
   },
   content: {
     flex: 1,
   },
   message: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: 15,
+    color: TEXT_PRIMARY,
     lineHeight: 22,
     marginBottom: 8,
   },
@@ -66,6 +70,6 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 13,
-    color: "#999",
+    color: TEXT_SECONDARY,
   },
 });

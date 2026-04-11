@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { castVote, removeVote } from "../services/votes";
 
+const PRIMARY_DARK = "#3DE0A0";
+const DOWNVOTE = "#FF6B6B";
+const TEXT_MUTED = "#A3A3A3";
+const TEXT_PRIMARY = "#1A1A1A";
+
 interface VoteButtonsProps {
   targetType: "post" | "comment";
   targetUuid: string;
@@ -23,7 +28,6 @@ export default function VoteButtons({
     const prevCount = voteCount;
 
     if (userVote === voteType) {
-      // remove vote
       setUserVote(null);
       setVoteCount(voteType === "upvote" ? voteCount - 1 : voteCount + 1);
       try {
@@ -33,7 +37,6 @@ export default function VoteButtons({
         setVoteCount(prevCount);
       }
     } else {
-      // cast or change vote
       let delta = voteType === "upvote" ? 1 : -1;
       if (prevVote === "upvote") delta -= 1;
       if (prevVote === "downvote") delta += 1;
@@ -88,19 +91,19 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   arrow: {
-    fontSize: 16,
-    color: "#999",
+    fontSize: 14,
+    color: TEXT_MUTED,
   },
   activeUpvote: {
-    color: "#6C63FF",
+    color: PRIMARY_DARK,
   },
   activeDownvote: {
-    color: "#FF6B6B",
+    color: DOWNVOTE,
   },
   count: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#333",
+    color: TEXT_PRIMARY,
     marginVertical: 2,
   },
 });
