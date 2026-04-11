@@ -59,5 +59,9 @@ export function useFeed(feedType: FeedType, lat: number, lng: number) {
 
   const hasMore = page < totalPages;
 
-  return { posts, loading, refreshing, loadInitial, refresh, loadMore, hasMore };
+  const prependPost = useCallback((post: PostRead) => {
+    setPosts((prev) => [post, ...prev]);
+  }, []);
+
+  return { posts, loading, refreshing, loadInitial, refresh, loadMore, hasMore, prependPost };
 }

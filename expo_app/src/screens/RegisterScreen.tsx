@@ -9,19 +9,26 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAuth } from "../context/AuthContext";
 
 type Props = NativeStackScreenProps<{ Login: undefined; Register: undefined }, "Register">;
 
+const PRIMARY = "#52FFB8";
+const BG = "#0A0A0A";
+const SURFACE = "#141414";
+const BORDER = "#2A2A2A";
+const TEXT_PRIMARY = "#F5F5F5";
+const TEXT_SECONDARY = "#737373";
+const TEXT_MUTED = "#525252";
+
 export default function RegisterScreen({ navigation }: Props) {
   const { register } = useAuth();
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
@@ -29,17 +36,11 @@ export default function RegisterScreen({ navigation }: Props) {
       Alert.alert("Error", "Username and password are required");
       return;
     }
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
-      return;
-    }
-
     setLoading(true);
     try {
       await register({
         username: username.trim(),
         password,
-        email: email.trim() || undefined,
         phone_number: phone.trim() || undefined,
       });
     } catch (err: any) {
@@ -58,72 +59,65 @@ export default function RegisterScreen({ navigation }: Props) {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join Shinkleesh</Text>
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/icon.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Shinkleesh</Text>
+        </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Username *"
-          placeholderTextColor="#999"
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+        {/* Form */}
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Username *"
+            placeholderTextColor={TEXT_MUTED}
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email (optional)"
-          placeholderTextColor="#999"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Phone number"
+            placeholderTextColor={TEXT_MUTED}
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Phone number (optional)"
-          placeholderTextColor="#999"
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Password *"
+            placeholderTextColor={TEXT_MUTED}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password *"
-          placeholderTextColor="#999"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm password *"
-          placeholderTextColor="#999"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity
-          style={[styles.registerButton, loading && styles.buttonDisabled]}
-          onPress={handleRegister}
-          disabled={loading}
-        >
-          <Text style={styles.registerButtonText}>
-            {loading ? "Creating account..." : "Sign Up"}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.buttonDisabled]}
+            onPress={handleRegister}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.registerButtonText}>
+              {loading ? "Creating account..." : "Sign Up"}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={styles.loginLink}
           onPress={() => navigation.goBack()}
         >
           <Text style={styles.loginText}>
-            Already have an account? <Text style={styles.loginBold}>Sign In</Text>
+            Already have an account?{" "}
+            <Text style={styles.loginBold}>Sign In</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -134,62 +128,70 @@ export default function RegisterScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: BG,
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
-    paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingHorizontal: 28,
+    paddingVertical: 48,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 48,
+  },
+  logo: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    marginBottom: 12,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "700",
+    fontSize: 22,
+    fontWeight: "600",
     textAlign: "center",
-    color: "#6C63FF",
-    marginBottom: 8,
+    color: TEXT_PRIMARY,
+    letterSpacing: 0.5,
   },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 32,
+  form: {
+    marginBottom: 0,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
+    borderColor: BORDER,
+    borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    fontSize: 16,
-    marginBottom: 12,
-    backgroundColor: "#f9f9f9",
+    fontSize: 15,
+    marginBottom: 14,
+    backgroundColor: SURFACE,
+    color: TEXT_PRIMARY,
   },
   registerButton: {
-    backgroundColor: "#6C63FF",
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: PRIMARY,
+    paddingVertical: 15,
+    borderRadius: 10,
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 6,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   registerButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    color: BG,
+    fontSize: 15,
     fontWeight: "600",
   },
   loginLink: {
-    marginTop: 20,
+    marginTop: 32,
     alignItems: "center",
   },
   loginText: {
     fontSize: 14,
-    color: "#666",
+    color: TEXT_SECONDARY,
   },
   loginBold: {
-    color: "#6C63FF",
+    color: PRIMARY,
     fontWeight: "600",
   },
 });

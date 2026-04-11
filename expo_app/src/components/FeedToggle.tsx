@@ -3,6 +3,10 @@ import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 
 type FeedType = "new" | "hot";
 
+const PRIMARY_DARK = "#3DE0A0";
+const BORDER = "#E5E5E5";
+const TEXT_MUTED = "#A3A3A3";
+
 interface FeedToggleProps {
   active: FeedType;
   onChange: (type: FeedType) => void;
@@ -34,8 +38,8 @@ export default function FeedToggle({ active, onChange }: FeedToggleProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
+    backgroundColor: "#F0F0F0",
+    borderRadius: 10,
     padding: 3,
     marginHorizontal: 16,
     marginVertical: 12,
@@ -43,23 +47,18 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     paddingVertical: 8,
-    borderRadius: 6,
+    borderRadius: 8,
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: PRIMARY_DARK,
   },
   tabText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#999",
+    color: TEXT_MUTED,
   },
   activeText: {
-    color: "#6C63FF",
+    color: "#fff",
   },
 });

@@ -2,10 +2,12 @@ import React from "react";
 import {
   TouchableOpacity,
   Text,
+  View,
   StyleSheet,
   Alert,
   ViewStyle,
 } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { API_BASE_URL } from "../config/env";
@@ -21,11 +23,15 @@ const PROVIDER_LABELS: Record<Provider, string> = {
   x: "X",
 };
 
-const PROVIDER_COLORS: Record<Provider, string> = {
-  google: "#DB4437",
-  facebook: "#4267B2",
-  x: "#000000",
+const PROVIDER_ICONS: Record<Provider, { name: React.ComponentProps<typeof FontAwesome>["name"]; color: string }> = {
+  google: { name: "google", color: "#DB4437" },
+  facebook: { name: "facebook", color: "#4267B2" },
+  x: { name: "close", color: "#F5F5F5" },
 };
+
+const BORDER_COLOR = "#2A2A2A";
+const SURFACE = "#141414";
+const TEXT_COLOR = "#F5F5F5";
 
 interface OAuthButtonProps {
   provider: Provider;
@@ -64,14 +70,19 @@ export default function OAuthButton({ provider, style }: OAuthButtonProps) {
 
   return (
     <TouchableOpacity
-      style={[
-        styles.button,
-        { backgroundColor: PROVIDER_COLORS[provider] },
-        style,
-      ]}
+      style={[styles.button, style]}
       onPress={handlePress}
+      activeOpacity={0.7}
     >
-      <Text style={styles.text}>Continue with {PROVIDER_LABELS[provider]}</Text>
+      <View style={styles.content}>
+        <FontAwesome
+          name={PROVIDER_ICONS[provider].name}
+          size={16}
+          color={PROVIDER_ICONS[provider].color}
+          style={styles.icon}
+        />
+        <Text style={styles.text}>Continue with {PROVIDER_LABELS[provider]}</Text>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -79,13 +90,25 @@ export default function OAuthButton({ provider, style }: OAuthButtonProps) {
 const styles = StyleSheet.create({
   button: {
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
     marginBottom: 10,
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER_COLOR,
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    marginRight: 10,
+    width: 18,
+    textAlign: "center",
   },
   text: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+    color: TEXT_COLOR,
+    fontSize: 14,
+    fontWeight: "500",
   },
 });

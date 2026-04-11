@@ -21,7 +21,7 @@ function HomeStackNavigator() {
       <HomeStack.Screen
         name="Home"
         component={HomeScreen}
-        options={{ title: "Shinkleesh" }}
+        options={{ headerShown: false }}
       />
       <HomeStack.Screen
         name="PostDetail"
