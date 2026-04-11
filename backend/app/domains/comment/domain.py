@@ -24,6 +24,10 @@ class CommentDomain:
             lng=payload.lng,
         )
         uow.comment_repository.save(model=comment, commit=False)
+
+        post.comment_count = (post.comment_count or 0) + 1
+        uow.post_repository.save(model=post, commit=False)
+
         return CommentRead.from_orm(comment)
 
     @staticmethod
@@ -71,4 +75,10 @@ class CommentDomain:
 
         comment.is_deleted = True
         uow.comment_repository.save(model=comment, commit=False)
+
+        post = uow.post_repository.find_one(uuid=comment.post_uuid, is_deleted=False)
+        if post and post.comment_count and post.comment_count > 0:
+            post.comment_count -= 1
+            uow.post_repository.save(model=post, commit=False)
+
         return CommentRead.from_orm(comment)
