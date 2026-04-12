@@ -26,7 +26,11 @@ function HomeStackNavigator() {
       <HomeStack.Screen
         name="PostDetail"
         component={PostDetailScreen}
-        options={{ title: "Post" }}
+        options={{
+          title: "Post",
+          headerBackTitle: "Back",
+          headerTintColor: "#3DE0A0",
+        }}
       />
       <HomeStack.Screen
         name="CreatePost"
