@@ -30,6 +30,7 @@ class PostRead(BaseModel):
     is_deleted: bool
     created_at: datetime
     updated_at: datetime
+    distance_from_user: float = 0.0
 
 
 class PostListParams(BaseModel):

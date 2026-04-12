@@ -19,6 +19,16 @@ from app.entrypoint.routes.common.errors import NotFoundError
 from models.post import Post as PostModel
 
 FEED_MIN_POSTS = 20
+_EARTH_RADIUS_KM = 6371.0
+
+
+def _haversine_km(lat1, lng1, lat2, lng2):
+    """Return the great-circle distance in km between two lat/lng points."""
+    lat1, lng1, lat2, lng2 = (math.radians(v) for v in (lat1, lng1, lat2, lng2))
+    dlat = lat2 - lat1
+    dlng = lng2 - lng1
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng / 2) ** 2
+    return _EARTH_RADIUS_KM * 2 * math.asin(math.sqrt(a))
 
 
 # ---------------------------------------------------------------------------
@@ -81,12 +91,18 @@ def delete_post(post_uuid: str):
 # List / Feed
 # ---------------------------------------------------------------------------
 
-def _build_post_page(posts, page, per_page):
+def _build_post_page(posts, page, per_page, user_lat=None, user_lng=None):
     total = len(posts)
     offset = (page - 1) * per_page
     page_posts = posts[offset:offset + per_page]
+    post_reads = []
+    for p in page_posts:
+        pr = PostRead.from_orm(p)
+        if user_lat is not None and user_lng is not None:
+            pr.distance_from_user = _haversine_km(user_lat, user_lng, p.lat, p.lng)
+        post_reads.append(pr)
     return PostPage(
-        posts=[PostRead.from_orm(p) for p in page_posts],
+        posts=post_reads,
         total_count=total,
         page=page,
         per_page=per_page,
@@ -119,7 +135,7 @@ def new_feed():
 
         # Main tile posts first (newest), then kring posts (newest)
         all_posts = main_posts + kring_posts
-        result = _build_post_page(all_posts, params.page, params.per_page).model_dump(mode="json")
+        result = _build_post_page(all_posts, params.page, params.per_page, params.lat, params.lng).model_dump(mode="json")
 
     return jsonify(result), 200
 
@@ -147,7 +163,7 @@ def hot_feed():
             all_posts += kring_posts
 
         all_posts.sort(key=lambda p: p.vote_count + p.comment_count, reverse=True)
-        result = _build_post_page(all_posts, params.page, params.per_page).model_dump(mode="json")
+        result = _build_post_page(all_posts, params.page, params.per_page, params.lat, params.lng).model_dump(mode="json")
 
     return jsonify(result), 200
 

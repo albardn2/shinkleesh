@@ -29,20 +29,23 @@ interface PostCardProps {
 export default function PostCard({ post, onPress }: PostCardProps) {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
-      <VoteButtons
-        targetType="post"
-        targetUuid={post.uuid}
-        initialVoteCount={post.vote_count}
-      />
       <View style={styles.content}>
         <Text style={styles.message}>{post.message}</Text>
         <View style={styles.meta}>
           <Text style={styles.metaText}>{timeAgo(post.created_at)}</Text>
           <Text style={styles.metaText}>
-            {post.comment_count} {post.comment_count === 1 ? "comment" : "comments"}
+            {post.comment_count} {post.comment_count === 1 ? "reply" : "replies"}
+          </Text>
+          <Text style={styles.metaText}>
+            {Math.round(post.distance_from_user ?? 0)} km
           </Text>
         </View>
       </View>
+      <VoteButtons
+        targetType="post"
+        targetUuid={post.uuid}
+        initialVoteCount={post.vote_count}
+      />
     </TouchableOpacity>
   );
 }
