@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { castVote, removeVote } from "../services/votes";
 
 const PRIMARY_DARK = "#3DE0A0";
@@ -58,25 +59,22 @@ export default function VoteButtons({
         onPress={() => handleVote("upvote")}
         style={styles.button}
       >
-        <Text
-          style={[styles.arrow, userVote === "upvote" && styles.activeUpvote]}
-        >
-          ▲
-        </Text>
+        <Ionicons
+          name="chevron-up"
+          size={22}
+          color={userVote === "upvote" ? PRIMARY_DARK : TEXT_MUTED}
+        />
       </TouchableOpacity>
       <Text style={styles.count}>{voteCount}</Text>
       <TouchableOpacity
         onPress={() => handleVote("downvote")}
         style={styles.button}
       >
-        <Text
-          style={[
-            styles.arrow,
-            userVote === "downvote" && styles.activeDownvote,
-          ]}
-        >
-          ▼
-        </Text>
+        <Ionicons
+          name="chevron-down"
+          size={22}
+          color={userVote === "downvote" ? PRIMARY_DARK : TEXT_MUTED}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -85,13 +83,13 @@ export default function VoteButtons({
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    marginRight: 12,
+    marginLeft: 12,
   },
   button: {
     padding: 4,
   },
   arrow: {
-    fontSize: 14,
+    fontSize: 18,
     color: TEXT_MUTED,
   },
   activeUpvote: {

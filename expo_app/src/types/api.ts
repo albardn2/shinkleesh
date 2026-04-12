@@ -31,6 +31,7 @@ export interface PostRead {
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
+  distance_from_user?: number;
 }
 
 export interface PostPage {
