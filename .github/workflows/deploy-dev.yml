@@ -46,11 +46,12 @@ jobs:
           script: |
             echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             cd /root/app/backend
+            docker compose -f docker-compose.dev.yaml down
+            docker system prune -af
             cat <<EOF > .env
             APP_HOST=api-dev.shinkleesh.com
             REGISTRY_URL=ghcr.io/albardn2/shinkleesh-backend
             EMAIL=zaid.bardan@gmail.com
             EOF
-            docker compose -f docker-compose.dev.yaml down
             docker compose -f docker-compose.dev.yaml pull
             docker compose -f docker-compose.dev.yaml up -d --scale migrate=0 --remove-orphans
