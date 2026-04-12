@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { castVote, removeVote } from "../services/votes";
@@ -23,6 +23,10 @@ export default function VoteButtons({
 }: VoteButtonsProps) {
   const [voteCount, setVoteCount] = useState(initialVoteCount);
   const [userVote, setUserVote] = useState<UserVote>(null);
+
+  useEffect(() => {
+    setVoteCount(initialVoteCount);
+  }, [initialVoteCount]);
 
   const handleVote = async (voteType: "upvote" | "downvote") => {
     const prevVote = userVote;
