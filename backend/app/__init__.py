@@ -6,6 +6,7 @@ from app.config import Config
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from authlib.integrations.flask_client import OAuth
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.entrypoint.routes.common.errors import register_error_handlers
 from app.entrypoint.routes.auth import auth_blueprint
@@ -21,6 +22,10 @@ load_dotenv()
 
 def create_app(config_object=Config):
     app = Flask(__name__)
+
+    # Behind Caddy — trust X-Forwarded-Proto / -Host / -For so url_for(_external=True)
+    # builds https:// URLs (needed for the OAuth redirect_uri Google validates).
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     # CORS(app, supports_credentials=True)
     # CORS FOR ANY ORIGIN
