@@ -3,7 +3,7 @@ import re
 import secrets
 from datetime import timedelta
 
-from flask import current_app, redirect, url_for
+from flask import current_app, redirect, request, session, url_for
 from flask_jwt_extended import create_access_token, create_refresh_token
 
 from app.adapters.unit_of_work.sqlalchemy_unit_of_work import SqlAlchemyUnitOfWork
@@ -11,6 +11,25 @@ from app.entrypoint.routes.auth import auth_blueprint
 from models.common import User as UserModel
 
 SUPPORTED_PROVIDERS = ('google', 'facebook', 'x')
+
+# Mobile deep-link schemes allowed to receive the OAuth token. Prevents the
+# redirect_uri query param from being used as an open redirect.
+ALLOWED_MOBILE_REDIRECT_PREFIXES = ('shinkleesh://', 'exp+shinkleesh://')
+MOBILE_REDIRECT_SESSION_KEY = 'oauth_mobile_redirect'
+
+
+def _is_allowed_mobile_redirect(uri: str) -> bool:
+    return any(uri.startswith(p) for p in ALLOWED_MOBILE_REDIRECT_PREFIXES)
+
+
+def _build_redirect(mobile_uri: str | None, **params: str) -> str:
+    if mobile_uri:
+        base = mobile_uri
+    else:
+        base = os.environ.get('FRONTEND_URL', 'http://localhost:5173').rstrip('/') + '/'
+    separator = '&' if '?' in base else '?'
+    query = '&'.join(f'{k}={v}' for k, v in params.items())
+    return f'{base}{separator}{query}'
 
 
 def _sanitize_username(name: str) -> str:
@@ -42,6 +61,13 @@ def _issue_jwt(user: UserModel) -> str:
 def oauth_login(provider: str):
     if provider not in SUPPORTED_PROVIDERS:
         return {'error': f'Unknown provider: {provider}'}, 400
+
+    mobile_redirect = request.args.get('redirect_uri')
+    if mobile_redirect and _is_allowed_mobile_redirect(mobile_redirect):
+        session[MOBILE_REDIRECT_SESSION_KEY] = mobile_redirect
+    else:
+        session.pop(MOBILE_REDIRECT_SESSION_KEY, None)
+
     from app import oauth_client
     redirect_uri = url_for('auth.oauth_callback', provider=provider, _external=True)
     return oauth_client.create_client(provider).authorize_redirect(redirect_uri)
@@ -49,10 +75,10 @@ def oauth_login(provider: str):
 
 @auth_blueprint.route('/oauth/<provider>/callback')
 def oauth_callback(provider: str):
-    frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+    mobile_redirect = session.pop(MOBILE_REDIRECT_SESSION_KEY, None)
 
     if provider not in SUPPORTED_PROVIDERS:
-        return redirect(f'{frontend_url}/?error=unknown_provider')
+        return redirect(_build_redirect(mobile_redirect, error='unknown_provider'))
 
     try:
         from app import oauth_client
@@ -80,7 +106,7 @@ def oauth_callback(provider: str):
             display_name = userinfo['data'].get('username', provider_id)
 
         else:
-            return redirect(f'{frontend_url}/?error=unknown_provider')
+            return redirect(_build_redirect(mobile_redirect, error='unknown_provider'))
 
         with SqlAlchemyUnitOfWork() as uow:
             # Look up by OAuth provider ID first
@@ -116,13 +142,13 @@ def oauth_callback(provider: str):
                 uow.user_repository.save(model=user, commit=False)
 
             if user.is_banned:
-                return redirect(f'{frontend_url}/?error=banned')
+                return redirect(_build_redirect(mobile_redirect, error='banned'))
 
             access_token = _issue_jwt(user)
             uow.commit()
 
-        return redirect(f'{frontend_url}/?token={access_token}')
+        return redirect(_build_redirect(mobile_redirect, token=access_token))
 
     except Exception as exc:
         current_app.logger.error(f'OAuth callback error [{provider}]: {exc}')
-        return redirect(f'{frontend_url}/?error=oauth_failed')
+        return redirect(_build_redirect(mobile_redirect, error='oauth_failed'))

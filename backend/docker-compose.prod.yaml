@@ -41,6 +41,8 @@ services:
       - db
     ports:
       - "5000:5000"
+    env_file:
+      - .env
     environment:
       SQLALCHEMY_DATABASE_URI: "postgresql://local:local@db:5432/backend"
       # Proxy & Let's Encrypt settings:

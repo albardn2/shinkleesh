@@ -52,6 +52,9 @@ jobs:
             APP_HOST=api-dev.shinkleesh.com
             REGISTRY_URL=ghcr.io/albardn2/shinkleesh-backend
             EMAIL=zaid.bardan@gmail.com
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            FRONTEND_URL=${{ secrets.DEV_FRONTEND_URL }}
             EOF
             docker compose -f docker-compose.dev.yaml pull
             docker compose -f docker-compose.dev.yaml up -d --scale migrate=0 --remove-orphans

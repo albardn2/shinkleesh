@@ -31,6 +31,16 @@ def create_app(config_object=Config):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     env_config = dotenv_values(os.path.join(BASE_DIR, "..", ".env"))
     app.config.from_mapping(env_config)
+    # Process-env overrides .env — used in containerized deploys where compose env_file
+    # loads values into os.environ rather than creating a .env file in the container.
+    for key in (
+        'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET',
+        'FACEBOOK_CLIENT_ID', 'FACEBOOK_CLIENT_SECRET',
+        'X_CLIENT_ID', 'X_CLIENT_SECRET',
+        'FRONTEND_URL',
+    ):
+        if os.environ.get(key):
+            app.config[key] = os.environ[key]
 
     app.config['JWT_SECRET_KEY'] = "super-secret-change-me"
     # accept tokens from both headers and cookies

@@ -81,6 +81,9 @@ jobs:
             APP_HOST=api-prod.shinkleesh.com
             REGISTRY_URL=ghcr.io/albardn2/shinkleesh-backend
             EMAIL=zaid.bardan@gmail.com
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            FRONTEND_URL=${{ secrets.PROD_FRONTEND_URL }}
             EOF
             docker compose -f docker-compose.prod.yaml down
             docker compose -f docker-compose.prod.yaml pull
@@ -105,6 +108,9 @@ jobs:
             APP_HOST=api-prod.shinkleesh.com
             REGISTRY_URL=ghcr.io/albardn2/shinkleesh-backend
             EMAIL=zaid.bardan@gmail.com
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            FRONTEND_URL=${{ secrets.PROD_FRONTEND_URL }}
             EOF
             docker compose -f docker-compose.prod.yaml down
             docker compose -f docker-compose.prod.yaml pull
