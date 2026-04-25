@@ -58,7 +58,7 @@ class User(Base):
     is_deleted = Column(Boolean, default=False, nullable=False)
 
     # OAuth / social login
-    oauth_provider = Column(String(50), nullable=True)       # e.g. "google", "facebook", "x"
+    oauth_provider = Column(String(50), nullable=True)       # e.g. "google", "apple"
     oauth_provider_id = Column(String(256), nullable=True)   # provider's user ID
 
     def set_password(self, plaintext_password):

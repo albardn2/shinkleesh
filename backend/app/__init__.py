@@ -40,8 +40,6 @@ def create_app(config_object=Config):
     # loads values into os.environ rather than creating a .env file in the container.
     for key in (
         'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET',
-        'FACEBOOK_CLIENT_ID', 'FACEBOOK_CLIENT_SECRET',
-        'X_CLIENT_ID', 'X_CLIENT_SECRET',
         'FRONTEND_URL',
     ):
         if os.environ.get(key):
@@ -65,29 +63,6 @@ def create_app(config_object=Config):
         client_secret=app.config.get('GOOGLE_CLIENT_SECRET', ''),
         server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
         client_kwargs={'scope': 'openid email profile'},
-    )
-
-    oauth_client.register(
-        name='facebook',
-        client_id=app.config.get('FACEBOOK_CLIENT_ID', ''),
-        client_secret=app.config.get('FACEBOOK_CLIENT_SECRET', ''),
-        api_base_url='https://graph.facebook.com/',
-        access_token_url='https://graph.facebook.com/oauth/access_token',
-        authorize_url='https://www.facebook.com/dialog/oauth',
-        client_kwargs={'scope': 'email,public_profile'},
-    )
-
-    oauth_client.register(
-        name='x',
-        client_id=app.config.get('X_CLIENT_ID', ''),
-        client_secret=app.config.get('X_CLIENT_SECRET', ''),
-        api_base_url='https://api.twitter.com/2/',
-        access_token_url='https://api.twitter.com/2/oauth2/token',
-        authorize_url='https://twitter.com/i/oauth2/authorize',
-        client_kwargs={
-            'scope': 'tweet.read users.read offline.access',
-            'code_challenge_method': 'S256',  # PKCE required by X
-        },
     )
 
     # Register blueprints
