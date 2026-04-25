@@ -40,6 +40,8 @@ services:
     # Caddy reverse-proxies to this service inside the network
     expose:
       - "5000"
+    env_file:
+      - .env
     environment:
       SQLALCHEMY_DATABASE_URI: "postgresql://local:local@db:5432/backend"
     networks:

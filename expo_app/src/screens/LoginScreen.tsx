@@ -14,6 +14,7 @@ import {
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAuth } from "../context/AuthContext";
 import OAuthButton from "../components/OAuthButton";
+import AppleSignInButton from "../components/AppleSignInButton";
 
 type Props = NativeStackScreenProps<{ Login: undefined; Register: undefined }, "Login">;
 
@@ -106,8 +107,7 @@ export default function LoginScreen({ navigation }: Props) {
           </View>
 
           <OAuthButton provider="google" />
-          <OAuthButton provider="facebook" />
-          <OAuthButton provider="x" />
+          {Platform.OS === "ios" && <AppleSignInButton />}
         </View>
 
         <TouchableOpacity
