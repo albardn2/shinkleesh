@@ -15,18 +15,14 @@ import { useAuth } from "../context/AuthContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
-type Provider = "google" | "facebook" | "x";
+type Provider = "google";
 
 const PROVIDER_LABELS: Record<Provider, string> = {
   google: "Google",
-  facebook: "Facebook",
-  x: "X",
 };
 
 const PROVIDER_ICONS: Record<Provider, { name: React.ComponentProps<typeof FontAwesome>["name"]; color: string }> = {
   google: { name: "google", color: "#DB4437" },
-  facebook: { name: "facebook", color: "#4267B2" },
-  x: { name: "close", color: "#F5F5F5" },
 };
 
 const BORDER_COLOR = "#2A2A2A";

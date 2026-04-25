@@ -27,7 +27,6 @@ const TEXT_MUTED = "#525252";
 export default function RegisterScreen({ navigation }: Props) {
   const { register } = useAuth();
   const [username, setUsername] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -41,7 +40,6 @@ export default function RegisterScreen({ navigation }: Props) {
       await register({
         username: username.trim(),
         password,
-        phone_number: phone.trim() || undefined,
       });
     } catch (err: any) {
       Alert.alert("Registration Failed", err.message);
@@ -79,15 +77,6 @@ export default function RegisterScreen({ navigation }: Props) {
             onChangeText={setUsername}
             autoCapitalize="none"
             autoCorrect={false}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Phone number"
-            placeholderTextColor={TEXT_MUTED}
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
           />
 
           <TextInput
